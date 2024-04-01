@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import os
+import requests
 import time
 
 app = Flask(__name__)
@@ -30,6 +31,12 @@ driver.set_page_load_timeout(30)
 @app.route('/')
 def home():
     return "Benvenuto al bot di Telegram per Tunefind!"
+
+def set_webhook():
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN_BOT}/setWebhook"
+    params = {'url': 'https://tunefind.onrender.com/' + TELEGRAM_TOKEN_BOT}
+    r = requests.post(url, params=params)
+    print(r.json())
 
 def handle_message(update, context):
     # Ottieni l'URL dal messaggio dell'utente
@@ -83,6 +90,9 @@ if __name__ == "__main__":
 
     # Aggiungi un gestore di messaggi al dispatcher
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+
+    # Imposta il webhook
+    set_webhook()
 
     # Avvia il bot
     app.run(host="0.0.0.0", port=int(os.getenv('PORT', 5000)))
