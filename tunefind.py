@@ -18,7 +18,8 @@ bot = Bot(token=TELEGRAM_TOKEN_BOT)
 # Crea un'istanza del driver del browser
 options = Options()
 options.add_argument("--headless")
-driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver', options=options, timeout=30)
+driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver', options=options)
+driver.set_page_load_timeout(30)
 
 def handle_message(update, context):
     # Ottieni l'URL dal messaggio dell'utente
