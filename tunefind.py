@@ -1,6 +1,7 @@
 from flask import Flask, request
 from telegram import Bot, Update
 from telegram.ext import Dispatcher, MessageHandler, Filters
+from telegram.ext import CommandHandler
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -25,6 +26,10 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver', options=options)
 driver.set_page_load_timeout(30)
+
+@app.route('/')
+def home():
+    return "Benvenuto al bot di Telegram per Tunefind!"
 
 def handle_message(update, context):
     # Ottieni l'URL dal messaggio dell'utente
@@ -66,9 +71,15 @@ def webhook():
     dp.process_update(update)
     return "OK"
 
+def start(update, context):
+    bot.send_message(chat_id=update.message.chat_id, text="Per favore, inserisci un URL valido da tunefind.com.")
+
 if __name__ == "__main__":
     # Crea un'istanza del Dispatcher
     dp = Dispatcher(bot, None, use_context=True)
+
+    # Aggiungi un gestore di comandi al dispatcher
+    dp.add_handler(CommandHandler("start", start))
 
     # Aggiungi un gestore di messaggi al dispatcher
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
