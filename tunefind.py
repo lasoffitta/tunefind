@@ -41,41 +41,44 @@ def set_webhook():
 def handle_message(update, context):
     # Ottieni l'URL dal messaggio dell'utente
     url = update.message.text
-    bot.send_message(chat_id=update.message.chat_id, text=f"URL ricevuto: {url}")  # Aggiungi qui
+
+    # Invia un messaggio iniziale e salva il suo ID
+    initial_message = bot.send_message(chat_id=update.message.chat_id, text=f"URL ricevuto: {url}")
+    message_id = initial_message.message_id
 
     # Verifica che l'URL sia un URL valido da tunefind.com
     if 'tunefind.com' not in url:
-        bot.send_message(chat_id=update.message.chat_id, text="Per favore, inserisci un URL valido da tunefind.com.")
+        bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text="Per favore, inserisci un URL valido da tunefind.com.")
         return
 
     # Vai alla pagina web
     driver.get(url)
-    bot.send_message(chat_id=update.message.chat_id, text=f"Visita la pagina: {url}")  # Aggiungi qui
+    bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text=f"Visita la pagina: {url}")
 
     # Aspetta che il pulsante "Show all tracks" sia presente e fai clic su di esso
     try:
         show_all_tracks_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//p[text()="Show all tracks"]')))
         show_all_tracks_button.click()
-        bot.send_message(chat_id=update.message.chat_id, text="Cliccato il pulsante 'Show all tracks'.")  # Aggiungi qui
+        bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text="Cliccato il pulsante 'Show all tracks'.")
         # Aspetta un po' per permettere al sito di caricare i nuovi brani
         time.sleep(5)
     except:
-        bot.send_message(chat_id=update.message.chat_id, text="Non è stato possibile trovare il pulsante 'Show all tracks'.")
+        bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text="Non è stato possibile trovare il pulsante 'Show all tracks'.")
 
     # Trova tutti gli elementi con la classe specifica per i titoli dei brani
     song_elements = driver.find_elements(By.CSS_SELECTOR, '.SongPreviewPlayer___StyledRow2-sc-dfotcz-7.cyJpmy')
-    bot.send_message(chat_id=update.message.chat_id, text=f"Trovati {len(song_elements)} elementi di canzoni")  # Aggiungi qui
+    bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text=f"Trovati {len(song_elements)} elementi di canzoni")
 
     # Per ogni elemento del titolo della canzone, trova l'elemento dell'artista corrispondente e invia l'artista e il titolo della canzone nel formato desiderato
     for song_element in song_elements:
         song_title = song_element.find_element(By.CSS_SELECTOR, '.SongPreviewPlayer___StyledTypography2-sc-dfotcz-9.lkkqNm').text
         artist_name = song_element.find_element(By.CSS_SELECTOR, '.sc-ksBlkl.fQsVMV.sc-iveFHk.lmmTYi').text
 
-        bot.send_message(chat_id=update.message.chat_id, text=artist_name + ' - ' + song_title)
+        bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text=artist_name + ' - ' + song_title)
 
     # Chiudi il driver del browser dopo aver elaborato ogni URL
     driver.quit()
-    bot.send_message(chat_id=update.message.chat_id, text="Driver del browser chiuso")  # Aggiungi qui
+    bot.edit_message_text(chat_id=update.message.chat_id, message_id=message_id, text="Driver del browser chiuso")
 
 @app.route('/' + TELEGRAM_TOKEN_BOT, methods=['POST'])
 def webhook():
