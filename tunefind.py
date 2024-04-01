@@ -67,7 +67,7 @@ dp = updater.dispatcher
 dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 # Imposta il webhook
-updater.start_webhook(listen="0.0.0.0", port=8443, url_path=TELEGRAM_TOKEN_BOT)
+updater.start_webhook(listen="0.0.0.0", port=80, url_path=TELEGRAM_TOKEN_BOT)
 updater.bot.set_webhook("https://tunefind.onrender.com/" + TELEGRAM_TOKEN_BOT)
 
 # Avvia il bot
