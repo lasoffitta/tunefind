@@ -63,9 +63,9 @@ dp = updater.dispatcher
 # Aggiungi un gestore di messaggi al dispatcher
 dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
-# Avvia il bot
-updater.start_polling()
+# Imposta il webhook
+updater.start_webhook(listen="0.0.0.0", port=int(os.environ.get('PORT', '8443')), url_path=TELEGRAM_TOKEN_BOT)
+updater.bot.set_webhook("https://tunefind.onrender.com/" + TELEGRAM_TOKEN_BOT)
 
-# Blocca fino a quando non viene premuto Ctrl-C o il processo non riceve SIGINT,
-# SIGTERM o SIGABRT. Questo dovrebbe essere usato maggiormente per il blocco del thread.
+# Avvia il bot
 updater.idle()
