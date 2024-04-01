@@ -24,6 +24,11 @@ def handle_message(update, context):
     # Ottieni l'URL dal messaggio dell'utente
     url = update.message.text
 
+    # Verifica che l'URL sia un URL valido da tunefind.com
+    if 'tunefind.com' not in url:
+        bot.send_message(chat_id=update.message.chat_id, text="Per favore, inserisci un URL valido da tunefind.com.")
+        return
+
     # Vai alla pagina web
     driver.get(url)
 
