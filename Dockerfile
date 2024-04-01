@@ -18,5 +18,8 @@ RUN chmod +x /usr/local/bin/chromedriver
 
 RUN pip install -r requirements.txt
 
+# Espone la porta 80
+EXPOSE 80
+
 # Esegui lo script Python quando il contenitore viene avviato
 CMD ["python", "tunefind.py"]
