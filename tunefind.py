@@ -1,13 +1,16 @@
+from flask import Flask, request
+from telegram import Bot, Update
+from telegram.ext import Dispatcher, MessageHandler, Filters
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from telegram import Bot
-from telegram.ext import CommandHandler, MessageHandler, Filters, Updater
 import os
 import time
+
+app = Flask(__name__)
 
 # Ottieni il token del bot di Telegram dall'ambiente
 TELEGRAM_TOKEN_BOT = os.getenv('TELEGRAM_TOKEN_BOT')
@@ -57,18 +60,18 @@ def handle_message(update, context):
     # Chiudi il driver del browser dopo aver elaborato ogni URL
     driver.quit()
 
-# Crea un'istanza dell'Updater
-updater = Updater(token=TELEGRAM_TOKEN_BOT, use_context=True)
+@app.route('/' + TELEGRAM_TOKEN_BOT, methods=['POST'])
+def webhook():
+    update = Update.de_json(request.get_json(), bot)
+    dp.process_update(update)
+    return "OK"
 
-# Ottieni il dispatcher da utilizzare per registrare gli handler
-dp = updater.dispatcher
+if __name__ == "__main__":
+    # Crea un'istanza del Dispatcher
+    dp = Dispatcher(bot, None, use_context=True)
 
-# Aggiungi un gestore di messaggi al dispatcher
-dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    # Aggiungi un gestore di messaggi al dispatcher
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
-# Imposta il webhook
-updater.start_webhook(listen="0.0.0.0", port=80, url_path=TELEGRAM_TOKEN_BOT)
-updater.bot.set_webhook("https://tunefind.onrender.com/" + TELEGRAM_TOKEN_BOT)
-
-# Avvia il bot
-updater.idle()
+    # Avvia il bot
+    app.run(host="0.0.0.0", port=int(os.getenv('PORT', 5000)))
